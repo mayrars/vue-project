@@ -9,5 +9,10 @@ export const useUserStore = defineStore('userStore', {
         minuscula(state){
             return state.userData.toLowerCase()
         }
+    },
+    actions:{
+        registerUser(name){
+            this.userData = name
+        }
     }
 })
