@@ -4,18 +4,16 @@
         <form @submit.prevent="handleSubmit">
             <input type="email" name="email" placeholder="Ingrese email" v-model.trim="email">
             <input type="password" name="password" placeholder="Ingrese contraseña" v-model.trim="password">
-            <button type="submit">Crear usuario</button>
+            <button type="submit" :disabled="userStore.loadingUser">Crear usuario</button>
         </form>
     </div>
 </template>
 
 <script setup>
     import { ref } from 'vue'
-    import { useUserStore } from '../stores/user'; 
-    import { useRouter } from 'vue-router'
+    import { useUserStore } from '../stores/user';
 
     const userStore = useUserStore()
-    const router = useRouter()
 
     const email = ref('')
     const password = ref('')
@@ -24,6 +22,5 @@
             return alert('Campos vacios')
         }
         await userStore.registerUser(email.value, password.value)
-        router.push('/')
     }
 </script>
