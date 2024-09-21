@@ -7,7 +7,7 @@ export const useUserStore = defineStore('userStore', {
     state: () => ({
         userData: null,
         loadingUser: false,
-        loadingSession: false,
+        loading: false,
     }),
     actions: {
         async registerUser(email, password){
