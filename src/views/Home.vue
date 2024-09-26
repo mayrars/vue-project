@@ -15,6 +15,7 @@
                 <br>
                 {{ item.short }}
                 <button @click="databaseStore.deleteUrl(item.id)">Eliminar</button>
+                <button @click="router.push(`/edit/${item.id}`)">Editar</button>
             </li>
         </ul>
     </div>
@@ -24,9 +25,11 @@
 import { useUserStore } from '../stores/user'; 
 import { useDatabaseStore } from '../stores/database';
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const userStore = useUserStore();
 const databaseStore = useDatabaseStore();
+const router = useRouter();
 
 databaseStore.getUrls()
 
