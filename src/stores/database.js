@@ -46,6 +46,23 @@ export const useDatabaseStore = defineStore('database', {
                 console.log(error)
             }
         },
+        async readUrl(id) {
+            try {
+                const docRef = doc(db, 'urls', id)
+                const docSnap = await getDoc(docRef)
+                if(!docSnap.exists()){
+                    throw new Error('No existe el documento')
+                }
+                if(docSnap.data().user !== auth.currentUser.uid){
+                    throw new Error('No tienes permisos para eliminar este documento')
+                }
+                return docSnap.data().name
+            } catch (error) {
+                console.log(error.message)
+            }finally{
+
+            }
+        },
         async deleteUrl(id){
             try {
                 const docRef = doc(db, 'urls', id)
