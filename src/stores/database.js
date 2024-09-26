@@ -1,6 +1,7 @@
-import { collection, query, getDocs,where } from 'firebase/firestore/lite'
+import { collection, query, getDocs,where, addDoc, doc, deleteDoc, getDoc } from 'firebase/firestore/lite'
 import {defineStore} from 'pinia'
 import { db, auth } from '../firebaseConfig'
+import { nanoid } from 'nanoid'
 
 export const useDatabaseStore = defineStore('database', {
     state: () => ({
@@ -27,6 +28,40 @@ export const useDatabaseStore = defineStore('database', {
                 console.log(error)
             }finally{
                 this.loadingDoc = false
+            }
+        },
+        async addUrl(name) {
+            try {
+                const objetoDoc = {
+                    name,
+                    short: nanoid(),
+                    user: auth.currentUser.uid,
+                }
+                const docRef = await addDoc(collection(db, 'urls'), objetoDoc)
+                this.documents.push({
+                    ...objetoDoc,
+                    id: docRef.id
+                })
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        async deleteUrl(id){
+            try {
+                const docRef = doc(db, 'urls', id)
+                const docSnap = await getDoc(docRef)
+                if(!docSnap.exists()){
+                    throw new Error('No existe el documento')
+                }
+                if(docSnap.data().user !== auth.currentUser.uid){
+                    throw new Error('No tienes permisos para eliminar este documento')
+                }
+                await deleteDoc(docRef)
+                this.documents = this.documents.filter(item => item.id !== id)
+            } catch (error) {
+                console.log(error.message)
+            }finally{
+                
             }
         }
     }
