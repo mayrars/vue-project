@@ -17,7 +17,7 @@ const route = useRoute();
 const databaseStore = useDatabaseStore();
 
 const handleSubmit= ()=> {
-    
+    databaseStore.updateUrl(route.params.id, url.value)
 }
 
 const url = ref('')
