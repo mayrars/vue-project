@@ -44,10 +44,6 @@
   const userStore = useUserStore();
   const route = useRoute()
   const selectedKeys = ref(['login']);
-  watch(
-    ()=>route.name,
-    ()=>{
-      selectedKeys.value = route.name
-    }
-  )
+  watch(()=>route.name,()=>selectedKeys.value = [route.name])
+
 </script>
