@@ -6,21 +6,30 @@
                 name="basicLogin" 
                 autocomplete="off" 
                 layout="vertical"
-                @submit.prevent="handleSubmit"
+                :model="formState"
+                @finish="onFinish"
+                @finishFailed="onFinishFailed"
             >
                 <a-form-item 
                     name="email" 
                     label="Ingresa tu correo" 
-                    :rules="[{ required: true, message: 'Ingresa tu correo' }]"
+                    :rules="[
+                        { 
+                            required: true, 
+                            whitespace: true, 
+                            type: 'email',
+                            message: 'Ingresa un correo vàlido' 
+                        }
+                    ]"
                 >
-                    <a-input v-model:value="email"></a-input>
+                    <a-input v-model:value="formState.email"></a-input>
                 </a-form-item>
                 <a-form-item
                     label="Ingrese contraseña"
                     name="password"
-                    :rules="[{ required: true, message: 'Ingresa una contraseña' }]"
+                    :rules="[{ required: true, min: 6, whitespace: true, message: 'Ingresa una contraseña con minimo 6 caracteres' }]"
                 >
-                    <a-input-password v-model:value="password" />
+                    <a-input-password v-model:value="formState.password" />
                 </a-form-item>
                 <a-form-item>
                     <a-button type="primary" html-type="submit" :disabled="userStore.loadingUser">Acceso</a-button>
@@ -31,17 +40,22 @@
 </template>
 
 <script setup>
-    import { ref } from 'vue'
+    import { reactive } from 'vue'
     import { useUserStore } from '../stores/user'; 
 
     const userStore = useUserStore()
 
-    const email = ref('')
-    const password = ref('')
-    const handleSubmit = async() => {
-        if(!email.value || password.value.length < 6) {
-            return alert('Campos vacios')
-        }
-        await userStore.loginUser(email.value, password.value)
+    const formState = reactive({
+        email: '',
+        password: ''
+    })
+
+    const onFinish = async (values) => {
+        console.log('Success:', values);
+        await userStore.loginUser(formState.email, formState.password)
+    };
+
+    const onFinishFailed = (errorInfo) => {
+        console.log('Failed:', errorInfo);
     }
 </script>
