@@ -32,7 +32,7 @@
                     <a-input-password v-model:value="formState.password" />
                 </a-form-item>
                 <a-form-item>
-                    <a-button type="primary" html-type="submit" :disabled="userStore.loadingUser">Acceso</a-button>
+                    <a-button type="primary" html-type="submit" :loading="userStore.loadingUser" :disabled="userStore.loadingUser">Acceso</a-button>
                 </a-form-item>
             </a-form>
         </a-col>    
@@ -57,7 +57,11 @@
         if(!error){
             return 
         }
-        console.log(error)
+
+        if(!error){
+            return message.success("Bienvenido")
+        }
+
         switch(error){
             case "auth/wrong-password":
                 message.error("Contraseña incorrecta")
