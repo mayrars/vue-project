@@ -53,7 +53,7 @@
                     ></a-input-password>
                 </a-form-item>
                 <a-form-item>
-                    <a-button type="primary" html-type="submit"
+                    <a-button type="primary" html-type="submit" :loading="userStore.loadingUser" :disabled="userStore.loadingUser"
                         >Acceder</a-button
                     >
                 </a-form-item>
@@ -65,6 +65,7 @@
 <script setup>
 import { reactive } from "vue";
 import { useUserStore } from "../stores/user";
+import { message } from 'ant-design-vue';
 
 const userStore = useUserStore();
 
@@ -86,8 +87,20 @@ const validateRePass = async (_rule, value) => {
 
 const onFinish = async (values) => {
     console.log("Success:", values);
-    await userStore.registerUser(values.email, values.password);
-    alert("Verifica tu cuenta de correo")
+    const error = await userStore.registerUser(values.email, values.password);
+
+    if(!error){
+        return message.success("Revisa tu correo electronico y verificalo")
+    }
+        
+    switch(error){
+        case "auth/email-already-in-use":
+            message.error("Este correo ya se encuentra registrado")
+            break;
+        default:
+            message.error("Error desconocido")
+            break;
+    }
 };
 
 const onFinishFailed = (errorInfo) => {
