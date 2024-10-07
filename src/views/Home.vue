@@ -2,10 +2,7 @@
     <div>
         <h1>Home </h1>
         <p>{{ userStore.userData?.email }}</p>
-        <form @submit.prevent="handleSubmit">
-            <input type="text" placeholder="Ingrese la URL" v-model="url">
-            <button type="submit">Agregar</button>
-        </form>
+        <add-form />
         <p v-if="databaseStore.loadingDoc">loading docs...</p>
         <ul class="lista" v-else>
             <li v-for="item in databaseStore.documents" :key="item.id">
@@ -24,7 +21,6 @@
 <script setup>
 import { useUserStore } from '../stores/user'; 
 import { useDatabaseStore } from '../stores/database';
-import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const userStore = useUserStore();
