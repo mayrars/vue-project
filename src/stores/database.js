@@ -70,6 +70,7 @@ export const useDatabaseStore = defineStore('database', {
             }
         },
         async updateUrl(id, name) {
+            this.loading = true
             try {
                 const docRef = doc(db, 'urls', id)
                 const docSnap = await getDoc(docRef)
@@ -87,9 +88,10 @@ export const useDatabaseStore = defineStore('database', {
                 )
                 router.push('/')
             } catch (error) {
-                console.log(error.message)
+                console.log(error.code)
+                return error.code
             }finally{
-                
+                this.loading = false
             }
         },
         async deleteUrl(id){

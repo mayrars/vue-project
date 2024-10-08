@@ -1,27 +1,64 @@
 <template>
-    <div>
-        <h1>Editar</h1>
-        <form @submit.prevent="handleSubmit">
-            <input type="text" placeholder="Ingrese la URL" v-model="url">
-            <button type="submit">Editar</button>
-        </form>
-    </div>
+    <h1>Editar</h1>
+    <a-form 
+        name="editForm"
+        autocomplete="off"
+        layout="vertical"
+        :model="formState"
+        @finish="onFinish"
+    >
+        <a-form-item
+            label="Ingrese URL"
+            name="url"
+            :rules="[
+                {
+                    required: true,
+                    whitespace: true,
+                    pattern: /^https?:\/\/[\w\-]+(\.[\w\-]+)+[/#?]?.*$/,
+                    message: 'Ingresa una URL válida',
+                },
+            ]"
+        >
+            <a-input
+                v-model:value="formState.url"
+                placeholder="https://www.google.com"
+            />
+        </a-form-item>
+        <a-form-item>
+            <a-button
+                type="primary"
+                html-type="submit"
+            >Editar</a-button>
+        </a-form-item>
+    </a-form>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { onMounted } from 'vue';
+import { onMounted, reactive } from 'vue'
 import { useRoute } from 'vue-router';
 import { useDatabaseStore } from '../stores/database';
+import { message } from 'ant-design-vue';
+
+const formState = reactive({
+    url: ''
+})
 const route = useRoute();
 const databaseStore = useDatabaseStore();
 
-const handleSubmit= ()=> {
-    databaseStore.updateUrl(route.params.id, url.value)
-}
+const onFinish = async(values) => {
+    const error = await databaseStore.updateUrl(route.params.id, formState.url)
+    if(!error){
+        formState.url = ''
+        return message.success('URL editada correctamente')
+    }
 
-const url = ref('')
+    switch(error){
+        default:
+            message.error("Error desconocido")
+            break;
+    }
+}
 onMounted(async()=>{
-    url.value = await databaseStore.readUrl(route.params.id)
+    formState.url = await databaseStore.readUrl(route.params.id)
 })
 </script>
