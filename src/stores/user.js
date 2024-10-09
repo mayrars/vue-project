@@ -5,9 +5,10 @@ import {
     signInWithEmailAndPassword,
     signOut,
 } from "firebase/auth";
-import { auth } from "../firebaseConfig";
+import { auth, db } from "../firebaseConfig";
 import router from '../router';
 import { useDatabaseStore } from './database';
+import { doc, getDoc, setDoc } from "firebase/firestore/lite";
 
 export const useUserStore = defineStore('userStore', {
     state: () => ({
@@ -33,7 +34,27 @@ export const useUserStore = defineStore('userStore', {
             this.loadingUser = true
             try {
                 const {user} = await signInWithEmailAndPassword(auth, email, password)
-                this.userData = {email: user.email, uid: user.uid}
+                
+
+                const docRef = doc(db, "users", user.uid)
+                const docSpan = await getDoc(docRef)
+                if(docSpan.exists()){
+                    this.userData = {...docSpan.data()}
+                }else{
+                    await setDoc(docRef, {
+                        email: user.email,
+                        uid: user.uid,
+                        displayName: user.displayName,
+                        photoURL: user.photoURL
+                    })
+
+                    this.userData = {
+                        email: user.email,
+                        uid: user.uid,
+                        displayName: user.displayName,
+                        photoURL: user.photoURL
+                    }
+                }
                 router.push("/")
             } catch (error) {
                 console.log(error)  
