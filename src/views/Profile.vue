@@ -47,9 +47,16 @@
 </template>
 
 <script setup>
+    import { message } from 'ant-design-vue';
     import { useUserStore } from '../stores/user';
+
     const userStore = useUserStore()
-    const onFinish = (values) => {
-        
+    const onFinish = async(values) => {
+        const error = await userStore.updateUser(userStore.userData.displayName)
+        if(!error){
+            message.success("Se actualizo tu informaciòn correctamente")
+        }else{
+            message.error("No se pudo actualizar tu informaciòn")
+        }
     }
 </script>
