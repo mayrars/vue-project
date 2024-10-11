@@ -4,6 +4,7 @@ import {
     onAuthStateChanged,
     signInWithEmailAndPassword,
     signOut,
+    updateProfile,
 } from "firebase/auth";
 import { auth, db } from "../firebaseConfig";
 import router from '../router';
@@ -30,27 +31,31 @@ export const useUserStore = defineStore('userStore', {
                 this.loadingUser = false
             }
         },
+        async updateUser(displayName){
+            this.loadingUser = true
+            try{
+                await updateProfile(auth.currentUser, {
+                      displayName
+                    }
+                )
+                this.setUser(auth.currentUser)
+            }catch(error){
+                return error.code
+            }finally{
+                this.loadingUser = false
+            }
+
+        },
         async setUser(user){
             try {
                 const docRef = doc(db, "users", user.uid)
-                const docSpan = await getDoc(docRef)
-                if(docSpan.exists()){
-                    this.userData = {...docSpan.data()}
-                }else{
-                    await setDoc(docRef, {
-                        email: user.email,
-                        uid: user.uid,
-                        displayName: user.displayName,
-                        photoURL: user.photoURL
-                    })
-
-                    this.userData = {
-                        email: user.email,
-                        uid: user.uid,
-                        displayName: user.displayName,
-                        photoURL: user.photoURL
-                    }
+                this.userData = {
+                    email: user.email,
+                    uid: user.uid,
+                    displayName: user.displayName,
+                    photoURL: user.photoURL
                 }
+                await setDoc(docRef, this.userData)
                     
             }catch(error){
                 return error.code
@@ -59,7 +64,8 @@ export const useUserStore = defineStore('userStore', {
         async loginUser(email, password){
             this.loadingUser = true
             try {
-                const {user} = await signInWithEmailAndPassword(auth, email, password)                
+                const {user} = await signInWithEmailAndPassword(auth, email, password)
+                await this.setUser(user)                
                 router.push("/")
             } catch (error) {
                 return error.code            
@@ -71,9 +77,9 @@ export const useUserStore = defineStore('userStore', {
             const databaseStore = useDatabaseStore()
             databaseStore.$reset()
             try {
-                await signOut(auth)
-                this.userData = null
                 router.push("/login")
+                await signOut(auth)
+                //this.userData = null
             } catch (error) {
                 console.log(err)                   
             }
@@ -84,7 +90,13 @@ export const useUserStore = defineStore('userStore', {
                     auth,
                     async (user) => {
                         if (user) {
-                            await this.setUser(user)
+                            //await this.setUser(user)
+                            this.userData = {
+                                email: user.email,
+                                uid: user.uid,
+                                displayName: user.displayName,
+                                photoURL: user.photoURL
+                            }
                         } else {
                             this.userData = null;
                             const databaseStore = useDatabaseStore()
