@@ -37,8 +37,17 @@
                     ]"
                 >
                     <a-input v-model:value="userStore.userData.displayName"></a-input>
-                </a-form-item>    
-                <a-form-item>
+                </a-form-item>  
+                <a-upload
+                    v-model:file-list="fileList"
+                    list-type="picture"
+                    :before-upload="beforeUpload"
+                    :max-count="1"
+                    @change="handleChange"
+                >
+                    <a-button>Subir foto de perfil</a-button>
+                </a-upload> 
+                <a-form-item style="margin-top: 20px">
                     <a-button type="primary" html-type="submit" :loading="userStore.loadingUser" :disabled="userStore.loadingUser">Actualizar informaciòn</a-button>
                 </a-form-item>
             </a-form>
@@ -49,10 +58,58 @@
 <script setup>
     import { message } from 'ant-design-vue';
     import { useUserStore } from '../stores/user';
+    import { ref } from 'vue';
 
     const userStore = useUserStore()
+    const fileList= ref([])
+
+    const beforeUpload = (file) => {
+        fileList.value = [...fileList.value, file]
+        return false
+    }
+
+    const handleRemove = file =>{
+        const indez = fileList.value.indexOf(file)
+        const newFileList = fileList.value.slice()
+        newFileList.splice(indez, 1)
+        fileList.value = newFileList
+    }
+
+    const handleChange = (info) => {
+        if(info.file.status!=='uploading'){
+            const isJpgOrPng = info.file.type === 'image/jpeg' || info.file.type === 'image/png';
+            if (!isJpgOrPng) {
+                message.error('Solo imagenes JPG o png!');
+                handleRemove(info.file)
+                return;
+            }
+            const isLt2M = info.file.size / 1024 / 1024 < 2;
+            if (!isLt2M) {
+                message.error('Màximo 2MB!');
+                handleRemove(info.file)
+                return;
+            }
+        }        
+
+        let resFileList = [...info.fileList]
+
+        resFileList = resFileList.slice(-1)
+
+        resFileList = resFileList.map(file => {
+            if (file.response) {
+                file.url = file.response.url;
+            }
+            return file;
+        })
+        fileList.value = resFileList
+    }
     const onFinish = async(values) => {
         const error = await userStore.updateUser(userStore.userData.displayName)
+
+        fileList.value.forEach(file => {
+            console.log(file)
+        })
+
         if(!error){
             message.success("Se actualizo tu informaciòn correctamente")
         }else{
