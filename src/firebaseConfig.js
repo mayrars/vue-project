@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore/lite";
+import { getStorage } from "firebase/storage";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const firebaseConfig = {
@@ -11,9 +12,10 @@ const firebaseConfig = {
   appId: "1:587619424480:web:9ea9ac223c778164fc5885"
 };
 
-initializeApp(firebaseConfig);
+const firebaseApp= initializeApp(firebaseConfig);
 
 const db = getFirestore();
 const auth = getAuth();
+const storage = getStorage(firebaseApp);
 
-export { db, auth };
+export { db, auth, storage };
