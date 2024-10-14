@@ -3,6 +3,7 @@
         <a-col :xs="{span:24}" :sm="{span:12, offset:6}" :md="{span:12, offset:6}" :lg="{span:12, offset:6}" :xl="{span:12, offset:6}">
 
             <h1>Perfil de usuario</h1>
+            <a-avatar :src="userStore.userData.photoURL" :size="150" shape="circle" class="mb-5"></a-avatar>
             <a-form 
                 name="basicProfile" 
                 autocomplete="off" 
@@ -103,12 +104,16 @@
         })
         fileList.value = resFileList
     }
-    const onFinish = async(values) => {
+    const onFinish = async() => {
         const error = await userStore.updateUser(userStore.userData.displayName)
 
-        fileList.value.forEach(file => {
-            console.log(file)
-        })
+        if(fileList.value[0]){
+            const error = await userStore.updateImage(fileList.value[0])
+            if(error)
+                return message.error("No se pudo actualizar tu imagen de perfil")
+            message.success("Se actualizo tu imagen de perfil correctamente")
+
+        }
 
         if(!error){
             message.success("Se actualizo tu informaciòn correctamente")
@@ -117,3 +122,8 @@
         }
     }
 </script>
+<style>
+.mb-5{
+    margin-bottom: 2rem;
+}
+</style>
