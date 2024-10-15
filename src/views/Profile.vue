@@ -105,16 +105,7 @@
         fileList.value = resFileList
     }
     const onFinish = async() => {
-        const error = await userStore.updateUser(userStore.userData.displayName)
-
-        if(fileList.value[0]){
-            const error = await userStore.updateImage(fileList.value[0])
-            if(error)
-                return message.error("No se pudo actualizar tu imagen de perfil")
-            message.success("Se actualizo tu imagen de perfil correctamente")
-
-        }
-
+        const error = await userStore.updateUser(userStore.userData.displayName,fileList.value[0])
         if(!error){
             message.success("Se actualizo tu informaciòn correctamente")
         }else{
