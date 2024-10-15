@@ -32,23 +32,17 @@ export const useUserStore = defineStore('userStore', {
                 this.loadingUser = false
             }
         },
-        async updateImage(imagen){
-            try {
-                const storageRef = ref(storage,`${this.userData.uid}/perfil`)
-                await uploadBytes(storageRef, imagen.originFileObj)
-                const photoURL = await getDownloadURL(storageRef)
-                await updateProfile(auth.currentUser, {
-                    photoURL
-                })
-                this.setUser(auth.currentUser)
-            } catch (error) {
-                console.log(error)
-                return error.code
-            }
-        },
-        async updateUser(displayName){
+        async updateUser(displayName,imagen){
             this.loadingUser = true
             try{
+                if(imagen){
+                    const storageRef = ref(storage,`perfiles/${this.userData.uid}`)
+                    await uploadBytes(storageRef, imagen.originFileObj)
+                    const photoURL = await getDownloadURL(storageRef)
+                    await updateProfile(auth.currentUser, {
+                        photoURL
+                    })
+                }
                 await updateProfile(auth.currentUser, {
                       displayName
                     }
