@@ -1,4 +1,4 @@
-import { collection, query, getDocs,where, addDoc, doc, deleteDoc, getDoc, updateDoc } from 'firebase/firestore/lite'
+import { collection, query, getDocs,where, doc, deleteDoc, getDoc, updateDoc, setDoc } from 'firebase/firestore/lite'
 import {defineStore} from 'pinia'
 import { db, auth } from '../firebaseConfig'
 import { nanoid } from 'nanoid'
@@ -40,10 +40,10 @@ export const useDatabaseStore = defineStore('database', {
                     short: nanoid(),
                     user: auth.currentUser.uid,
                 }
-                const docRef = await addDoc(collection(db, 'urls'), objetoDoc)
+                await setDoc(doc(db, 'urls', objetoDoc.short), objetoDoc)
                 this.documents.push({
                     ...objetoDoc,
-                    id: docRef.id
+                    id: objetoDoc.short
                 })
             } catch (error) {
                 console.log(error.code)
