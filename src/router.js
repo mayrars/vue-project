@@ -5,6 +5,7 @@ import Login from "./views/Login.vue";
 import Register from "./views/Register.vue";
 import Editar from "./views/Editar.vue";
 import Profile from "./views/Profile.vue";
+import NotFound from "./views/NotFound.vue";
 
 const requireAuth =  async (to, from, next) => {
   const userStore = useUserStore();
@@ -23,7 +24,8 @@ const routes = [
   { path: "/profile", component: Profile, beforeEnter: [requireAuth],name:'profile'},
   { path: "/edit/:id", component: Editar, beforeEnter: [requireAuth],name:'edit'},
   { path: "/login", component: Login, name:'login' },
-  { path: "/register", component: Register,name:'register' }
+  { path: "/register", component: Register,name:'register' },
+  { path: "/:pathMatch(.*)", component: NotFound,name:'404' }
 ]
 
 const router = createRouter({
