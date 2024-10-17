@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useUserStore } from "./stores/user";
+import { useDatabaseStore } from "./stores/database";
+
 import Home from "./views/Home.vue";
 import Login from "./views/Login.vue";
 import Register from "./views/Register.vue";
@@ -19,13 +21,28 @@ const requireAuth =  async (to, from, next) => {
   userStore.loadingSession = false
 }
 
+const redirection = async (to, from, next) => {
+  const databaseStore = useDatabaseStore();
+  const userStore = useUserStore();
+  userStore.loadingSession = true
+  const name = await databaseStore.getURL(to.params.pathMatch[0])
+  if(!name){
+    next()
+    userStore.loadingSession = false
+  }else{
+    window.location.href = name
+    userStore.loadingSession = true
+    next()
+  }
+}
+
 const routes = [
   { path: "/", component: Home, beforeEnter: [requireAuth], name:'home' },
   { path: "/profile", component: Profile, beforeEnter: [requireAuth],name:'profile'},
   { path: "/edit/:id", component: Editar, beforeEnter: [requireAuth],name:'edit'},
   { path: "/login", component: Login, name:'login' },
   { path: "/register", component: Register,name:'register' },
-  { path: "/:pathMatch(.*)", component: NotFound,name:'404' }
+  { path: "/:pathMatch(.*)*", component: NotFound,name:'404', beforeEnter: [redirection] },
 ]
 
 const router = createRouter({
