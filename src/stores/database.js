@@ -12,6 +12,20 @@ export const useDatabaseStore = defineStore('database', {
         error: null,
     }),
     actions: {
+        async getURL(id){
+            try {
+                const docRef = doc(db, 'urls', id)
+                const docSnap = await getDoc(docRef)
+                if(!docSnap.exists()){
+                    return false
+                }
+                return docSnap.data().name
+            } catch (error) {
+                return false
+            }finally{
+
+            }
+        },
         async getUrls() {
             if(this.documents.length !==0 ) return
             this.loadingDoc = true
