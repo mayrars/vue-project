@@ -21,6 +21,7 @@
                             >Eliminar</a-button>
                         </a-popconfirm>
                         <a-button type="primary" @click="router.push(`/edit/${item.id}`)">Editar</a-button>
+                        <a-button @click="copyToClipboard(item.id)">Copiar</a-button>
                     </a-space>
                 </template>
                 <p>{{item.name}}</p>
@@ -52,5 +53,21 @@ const confirm = async (id)=>{
 
 const cancel= ()=>{
     message.error('No se elimino el documento');
+}
+
+const copyToClipboard = async(id)=>{
+    if(!navigator.clipboard){
+        return message.error('No se pudo copiar al portapapeles');
+    }
+
+    const path = `${window.location.origin}/${id}`
+    navigator.clipboard.writeText(path)
+    .then(()=>{
+        message.success('Se copio al portapapeles')
+    })
+    .catch(()=>{
+        message.error('No se pudo copiar al portapapeles')
+    })
+    
 }
 </script>
